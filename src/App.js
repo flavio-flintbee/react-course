@@ -6,36 +6,35 @@ class App extends Component {
 
   state = {
     persons: [
-      { name: 'Max', age: 28 },
-      { name: 'Flavio', age: 27 },
-      { name: 'Stephanie', age: 35 }
-
+      { id: "p1", name: 'Max', age: 28 },
+      { id: "p123", name: 'Flavio', age: 27 },
+      { id: "p3441", name: 'Stephanie', age: 35 }
     ]
   }
 
-  switchNameHandler = (newName) => {
-    //console.log('was clicked!');
-    // DONT DO THIS this.state.persons[0].name = 'Bártolo';
-    this.setState({
-      persons: [
-        { name: newName, age: 28 },
-        { name: 'Bártolo', age: 27 },
-        { name: 'Stephanie', age: 29 }
+  nameChangedHandler = (event, id)  => {
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id;
+    });
 
-      ],
-      showPersons: false
-    })
+    const person = {
+      ...this.state.persons[personIndex]
+    }
+    
+    person.name = event.target.value;
+
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+
+    this.setState({ persons: persons });
+    
   }
 
-  nameChangedHandler = (event)  => {
-    this.setState({
-      persons: [
-        { name: 'Flávio', age: 28 },
-        { name: event.target.value, age: 27 },
-        { name: 'Stephanie', age: 29 }
-
-      ]
-    })
+  deletePersonHandler = (personIndex) => {
+   // const persons = this.state.persons.slide(); // creates a copy of persons array before manipulating it with out splice it would only be a pointer to th original array wich could cause future problems
+    const persons = [...this.state.persons]; // spreads out the elements of state.persons array creates a list of elements and adds them to the new array
+    persons.splice(personIndex, 1);
+    this.setState({persons: persons})
   }
 
   togglePersonsHandler = () => {
@@ -60,17 +59,14 @@ class App extends Component {
     if (this.state.showPersons) {
       persons = (
           <div>
-            <Person 
-              name={this.state.persons[0].name} 
-              age={this.state.persons[0].age} />
-            <Person 
-              name={this.state.persons[1].name} 
-              age={this.state.persons[1].age}
-              click={this.switchNameHandler.bind(this, 'Bártolo!')} 
-              changed={this.nameChangedHandler} > My Hobbies: Racing </Person>
-            <Person 
-              name={this.state.persons[2].name} 
-              age={this.state.persons[2].age} />
+            {this.state.persons.map((person, index) => {
+              return <Person 
+                click={() => this.deletePersonHandler(index)}
+                name={person.name} 
+                age={person.age} 
+                key={person.id}
+                changed={(event) => this.nameChangedHandler(event, person.id)} />
+            })}
           </div> 
       );
     } 
